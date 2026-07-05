@@ -6,7 +6,9 @@ export default function App() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    fetch("/assets/sampler_demos/manifest.json")
+    const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+    fetch(`${base}/assets/sampler_demos/manifest.json`)
       .then((response) => {
         if (!response.ok) {
           throw new Error("Could not load sampler demo manifest.");

@@ -36,7 +36,9 @@ function classNames(...items) {
 
 function assetPath(benchmark, folder, filename) {
   if (!benchmark?.basePath || !filename) return "";
-  return `/${benchmark.basePath.replace(/^\//, "")}/${folder}/${filename}`;
+  const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+  const bench = benchmark.basePath.replace(/^\/|\/$/g, "");
+  return `${base}/${bench}/${folder}/${filename}`;
 }
 
 function picturePath(benchmark, filename) {
