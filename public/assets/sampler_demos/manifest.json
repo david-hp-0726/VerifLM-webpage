@@ -1,0 +1,84 @@
+{
+  "candidateCount": 3,
+  "defaultMode": "vlm_constrained",
+  "benchmarks": [
+    {
+      "id": "mug_on_rack",
+      "title": "Mug on Rack",
+      "instruction": "Hang the mug on the rack by its handle.",
+      "activeObject": "mug",
+      "passiveObject": "rack",
+      "assetPrefix": "mug",
+      "basePath": "assets/sampler_demos/mug_on_rack",
+      "failedCandidates": {
+        "novlm": [
+          2
+        ],
+        "vlm": [
+          3
+        ]
+      },
+      "failureReasons": {
+        "novlm_2": "Unstable contact",
+        "vlm_3": "Missed handle contact"
+      },
+      "searchGuidance": {
+        "novlm": {
+          "x": "minor correction",
+          "y": "minor correction",
+          "z": "minor correction",
+          "roll": "minor correction",
+          "pitch": "minor correction",
+          "yaw": "minor correction"
+        },
+        "vlm": {
+          "x": "major correction (-)",
+          "y": "correct",
+          "z": "minor correction (+)",
+          "roll": "correct",
+          "pitch": "major correction",
+          "yaw": "major correction"
+        }
+      }
+    },
+    {
+      "id": "plate_on_rack",
+      "title": "Plate on Rack",
+      "instruction": "Place the plate upright in the rack slot.",
+      "activeObject": "plate",
+      "passiveObject": "rack",
+      "assetPrefix": "plate",
+      "basePath": "assets/sampler_demos/plate_on_rack",
+      "failedCandidates": {
+        "novlm": [
+          2
+        ],
+        "vlm": [
+          3
+        ]
+      },
+      "failureReasons": {
+        "novlm_2": "Falls after settling",
+        "vlm_3": "Wrong support contact"
+      },
+      "searchGuidance": {
+        "novlm": {
+          "x": "minor correction",
+          "y": "minor correction",
+          "z": "minor correction",
+          "roll": "minor correction",
+          "pitch": "minor correction",
+          "yaw": "minor correction"
+        },
+        "vlm": {
+          "x": "correct",
+          "y": "correct",
+          "z": "minor correction (-)",
+          "roll": "correct",
+          "pitch": "major correction",
+          "yaw": "correct"
+        }
+      }
+    }
+  ]
+}
