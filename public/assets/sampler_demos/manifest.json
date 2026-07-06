@@ -12,10 +12,7 @@
       "basePath": "assets/sampler_demos/mug_on_rack",
       "failedCandidates": {
         "novlm": [
-          2
-        ],
-        "vlm": [
-          3
+          1,3
         ]
       },
       "failureReasons": {
@@ -36,8 +33,8 @@
           "y": "correct",
           "z": "minor correction (+)",
           "roll": "correct",
-          "pitch": "major correction",
-          "yaw": "major correction"
+          "pitch": "minor correction",
+          "yaw": "correct"
         }
       }
     },
@@ -51,9 +48,6 @@
       "basePath": "assets/sampler_demos/plate_on_rack",
       "failedCandidates": {
         "novlm": [
-          2
-        ],
-        "vlm": [
           3
         ]
       },

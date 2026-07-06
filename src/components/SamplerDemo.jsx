@@ -332,8 +332,9 @@ function CandidatePicker({ candidates, selectedCandidateId, onSelect }) {
   );
 }
 
-function GoalStage({ benchmark, goalReady, onEdit }) {
+function GoalStage({ benchmark, goalReady, poseReady, onEdit, onDetectPose }) {
   return (
+    <>
     <div className="goal-stage-grid">
       <div>
         <h4>Input</h4>
@@ -362,6 +363,18 @@ function GoalStage({ benchmark, goalReady, onEdit }) {
         )}
       </div>
     </div>
+      {goalReady && !poseReady && (
+        <button type="button" className="goal-pose-action" onClick={onDetectPose}>
+          Use perception module to detect and render goal pose
+        </button>
+      )}
+
+      {poseReady && (
+        <div className="goal-rendered-views">
+          <SamplingReferenceContext benchmark={benchmark} />
+        </div>
+      )}
+    </>
   );
 }
 
@@ -379,34 +392,48 @@ function GoalEditContext({ benchmark }) {
 }
 
 function SamplingReferenceContext({ benchmark }) {
-  const views = [
-    { title: "Active axes · front", filename: "goal_scene_axes.png" },
-    { title: "Active axes · back", filename: "goal_scene_axes_reverse.png" },
-    { title: "Passive axes · front", filename: "goal_scene_world_axes.png" },
-    { title: "Passive axes · back", filename: "goal_scene_world_axes_reverse.png" }
+  const viewGroups = [
+    {
+      title: "Views with active object frame rendered (for rotation reasoning)",
+      views: [
+        { title: "Front view", filename: "goal_scene_axes.png" },
+        { title: "Back view", filename: "goal_scene_axes_reverse.png" }
+      ]
+    },
+    {
+      title: "Views with world frame rendered (for translational reasoning)",
+      views: [
+        { title: "Front view", filename: "goal_scene_world_axes.png" },
+        { title: "Back view", filename: "goal_scene_world_axes_reverse.png" }
+      ]
+    }
   ];
 
   return (
     <div className="sampling-views-panel">
-      <h4>Rendered goal views</h4>
-      <div className="sampling-views-grid">
-        {views.map((view) => (
-          <div className="sampling-view-card" key={view.filename}>
-            <MediaBox
-              className="sampling-view-media"
-              src={picturePath(benchmark, view.filename)}
-              alt={`${benchmark.title} ${view.title}`}
-              placeholder={view.filename}
-            />
-            <span>{view.title}</span>
+      {viewGroups.map((group) => (
+        <div className="sampling-view-group" key={group.title}>
+          <h4>{group.title}</h4>
+          <div className="sampling-views-grid">
+            {group.views.map((view) => (
+              <div className="sampling-view-card" key={view.filename}>
+                <MediaBox
+                  className="sampling-view-media"
+                  src={picturePath(benchmark, view.filename)}
+                  alt={`${benchmark.title} ${group.title} ${view.title}`}
+                  placeholder={view.filename}
+                />
+                <span>{view.title}</span>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
+        </div>
+      ))}
     </div>
   );
 }
 
-function SamplingStage({ benchmark, mode, modeId, onModeChange, started, onRun, onDone, replayKey }) {
+function SamplingStage({ benchmark, mode, modeId, onModeChange, started, onRun, replayKey }) {
   return (
     <>
       <ModeSelector activeModeId={modeId} onChange={onModeChange} />
@@ -425,7 +452,6 @@ function SamplingStage({ benchmark, mode, modeId, onModeChange, started, onRun, 
               src={videoPath(benchmark, mode.samplerVideo)}
               alt={`Sampler animation for ${benchmark.title}`}
               placeholder={mode.samplerVideo}
-              onEnded={onDone}
             />
           ) : (
             <ActionMediaBox
@@ -462,11 +488,6 @@ function CandidatesStage({ benchmark, mode, selectedCandidate, onSelect }) {
               />
               {failedSelected && <span className="candidate-status failed preview">Failed</span>}
             </div>
-            {failedSelected && (
-              <p className="candidate-warning">
-                This candidate is labeled as task failure, so trajectory execution is disabled.
-              </p>
-            )}
           </>
         ) : (
           <div className="media placeholder-media main-media" role="img" aria-label="Candidate selection">
@@ -528,6 +549,7 @@ export default function SamplerDemo({ benchmarks, defaultMode = "vlm_constrained
 
   const [stage, setStage] = useState("goal");
   const [goalReady, setGoalReady] = useState(false);
+  const [poseReady, setPoseReady] = useState(false);
   const [samplingStarted, setSamplingStarted] = useState(false);
   const [samplingDone, setSamplingDone] = useState(false);
   const [selectedCandidate, setSelectedCandidate] = useState(null);
@@ -540,6 +562,7 @@ export default function SamplerDemo({ benchmarks, defaultMode = "vlm_constrained
     setModeId(nextBenchmark?.defaultMode || defaultMode);
     setStage("goal");
     setGoalReady(false);
+    setPoseReady(false);
     setSamplingStarted(false);
     setSamplingDone(false);
     setSelectedCandidate(null);
@@ -559,6 +582,10 @@ export default function SamplerDemo({ benchmarks, defaultMode = "vlm_constrained
     setGoalReady(true);
   }
 
+  function handleDetectPose() {
+    setPoseReady(true);
+  }
+
   function handleModeChange(nextModeId) {
     setModeId(nextModeId);
     resetSamplingBranch();
@@ -566,7 +593,7 @@ export default function SamplerDemo({ benchmarks, defaultMode = "vlm_constrained
 
   function handleRunSampler() {
     setSamplingStarted(true);
-    setSamplingDone(false);
+    setSamplingDone(true);
     setSelectedCandidate(null);
     setExecutionStarted(false);
     setReplayKey((value) => value + 1);
@@ -585,7 +612,7 @@ export default function SamplerDemo({ benchmarks, defaultMode = "vlm_constrained
 
   function canVisit(nextStage) {
     if (nextStage === "goal") return true;
-    if (nextStage === "sampling") return goalReady;
+    if (nextStage === "sampling") return poseReady;
     if (nextStage === "candidates") return samplingDone;
     if (nextStage === "execution") return isSuccessfulCandidate(selectedCandidate);
     return false;
@@ -597,7 +624,7 @@ export default function SamplerDemo({ benchmarks, defaultMode = "vlm_constrained
   }
 
   const completed = {
-    goal: goalReady,
+    goal: poseReady,
     sampling: samplingDone,
     candidates: isSuccessfulCandidate(selectedCandidate),
     execution: executionStarted
@@ -625,7 +652,13 @@ export default function SamplerDemo({ benchmarks, defaultMode = "vlm_constrained
       />
 
       {stage === "goal" && (
-        <GoalStage benchmark={benchmark} goalReady={goalReady} onEdit={handleGoalEdit} />
+        <GoalStage
+          benchmark={benchmark}
+          goalReady={goalReady}
+          poseReady={poseReady}
+          onEdit={handleGoalEdit}
+          onDetectPose={handleDetectPose}
+        />
       )}
 
       {stage === "sampling" && (
@@ -636,7 +669,6 @@ export default function SamplerDemo({ benchmarks, defaultMode = "vlm_constrained
           onModeChange={handleModeChange}
           started={samplingStarted}
           onRun={handleRunSampler}
-          onDone={() => setSamplingDone(true)}
           replayKey={replayKey}
         />
       )}

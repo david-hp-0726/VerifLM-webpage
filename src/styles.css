@@ -399,6 +399,33 @@ video.media {
   margin-top: 1rem;
 }
 
+.goal-pose-action {
+  align-items: center;
+  background: #edf3ff;
+  border-color: #2f6fed;
+  border-radius: 16px;
+  color: #1d4ed8;
+  display: flex;
+  font-weight: 820;
+  justify-content: center;
+  margin: 1rem 0 0;
+  padding: 0.9rem 1rem;
+  width: 100%;
+}
+
+.goal-pose-action:hover:not(:disabled) {
+  background: #e6efff;
+  border-color: #1d4ed8;
+  box-shadow: 0 0 0 4px rgba(47, 111, 237, 0.14), 0 14px 38px rgba(47, 111, 237, 0.16);
+  transform: translateY(-1px);
+}
+
+.goal-rendered-views {
+  border-top: 1px solid #edf0f4;
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+}
+
 .goal-stage-grid .media,
 .goal-context-card .media {
   aspect-ratio: 4 / 3;
@@ -681,6 +708,10 @@ video.media {
 
 .sampling-views-panel {
   min-width: 0;
+}
+
+.sampling-view-group + .sampling-view-group {
+  margin-top: 1rem;
 }
 
 .sampling-views-grid {
