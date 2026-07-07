@@ -297,19 +297,26 @@ function SearchSpaceStrip({ benchmark, mode }) {
   );
 }
 
-function CandidatePicker({ candidates, selectedCandidateId, onSelect }) {
+function CandidatePicker({ candidates, selectedCandidateId, onSelect, interactive = true }) {
   return (
     <div className="candidate-grid">
       {candidates.map((candidate) => {
         const failed = !isSuccessfulCandidate(candidate);
-        const selected = selectedCandidateId === candidate.id;
+        const selected = interactive && selectedCandidateId === candidate.id;
+        const CandidateElement = interactive ? "button" : "div";
 
         return (
-          <button
+          <CandidateElement
             key={candidate.id}
-            className={classNames("candidate", selected && "active", failed && "failed")}
-            onClick={() => onSelect(candidate)}
-            type="button"
+            className={classNames(
+              "candidate",
+              selected && "active",
+              failed && "failed",
+              !interactive && "inactive"
+            )}
+            onClick={interactive ? () => onSelect(candidate) : undefined}
+            type={interactive ? "button" : undefined}
+            aria-disabled={!interactive ? "true" : undefined}
           >
             <div className="candidate-media-wrap">
               <MediaBox
@@ -318,6 +325,7 @@ function CandidatePicker({ candidates, selectedCandidateId, onSelect }) {
                 placeholder="Candidate render"
               />
               {failed && <span className="candidate-status failed">Failed</span>}
+              {!failed && <span className="candidate-status succeeded">Successful</span>}
             </div>
             <span>{candidate.caption}</span>
             {failed && (
@@ -325,7 +333,7 @@ function CandidatePicker({ candidates, selectedCandidateId, onSelect }) {
                 {candidate.failureReason || "Task failure"}
               </small>
             )}
-          </button>
+          </CandidateElement>
         );
       })}
     </div>
@@ -470,6 +478,8 @@ function SamplingStage({ benchmark, mode, modeId, onModeChange, started, onRun, 
 
 function CandidatesStage({ benchmark, mode, selectedCandidate, onSelect }) {
   const candidates = getCandidates(benchmark, mode);
+  const alternateMode = MODES.find((item) => item.id !== mode.id) || MODES[0];
+  const alternateCandidates = getCandidates(benchmark, alternateMode);
   const failedSelected = selectedCandidate && !isSuccessfulCandidate(selectedCandidate);
 
   return (
@@ -496,12 +506,28 @@ function CandidatesStage({ benchmark, mode, selectedCandidate, onSelect }) {
         )}
       </div>
       <div className="candidate-section compact span-two-columns">
-        <h4>Candidate poses</h4>
-        <CandidatePicker
-          candidates={candidates}
-          selectedCandidateId={selectedCandidate?.id}
-          onSelect={onSelect}
-        />
+        <div className="candidate-row">
+          <div className="candidate-row-heading">
+            <h4>{mode.label} candidate poses</h4>
+            <span className="candidate-mode-badge active">Selected sampler</span>
+          </div>
+          <CandidatePicker
+            candidates={candidates}
+            selectedCandidateId={selectedCandidate?.id}
+            onSelect={onSelect}
+          />
+        </div>
+        <div className="candidate-row inactive">
+          <div className="candidate-row-heading">
+            <h4>For comparison: {alternateMode.label} candidates</h4>
+          </div>
+          <CandidatePicker
+            candidates={alternateCandidates}
+            selectedCandidateId={null}
+            onSelect={onSelect}
+            interactive={false}
+          />
+        </div>
       </div>
     </div>
   );

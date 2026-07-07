@@ -29,9 +29,9 @@
           "yaw": "minor correction"
         },
         "vlm": {
-          "x": "major correction (-)",
+          "x": "minor correction (-)",
           "y": "correct",
-          "z": "minor correction (+)",
+          "z": "correct",
           "roll": "correct",
           "pitch": "minor correction",
           "yaw": "correct"

@@ -46,11 +46,7 @@ export default function App() {
       </section>
 
       <section className="section">
-        <h2>Interactive Sampler Replay</h2>
-        <p className="section-intro">
-          A pre-rendered replay of the image-edit, sampling, candidate selection, and execution flow.
-        </p>
-
+        <h2>Interactive Demo</h2>
         {error && <p className="error">{error}</p>}
         {manifest?.benchmarks ? (
           <SamplerDemo benchmarks={manifest.benchmarks} defaultMode={manifest.defaultMode} />
