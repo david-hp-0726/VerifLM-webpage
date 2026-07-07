@@ -22,7 +22,7 @@ export default function App() {
   return (
     <main className="page">
       <section className="hero">
-        <p className="eyebrow">Edit2Pose</p>
+        <p className="eyebrow">VerifLM</p>
         <h1>Image-Edit-Guided 6D Goal Specification for Robotic Manipulation</h1>
         <p className="subtitle">
           We use an edited image as a visual interface for goal pose specification, then sample,
