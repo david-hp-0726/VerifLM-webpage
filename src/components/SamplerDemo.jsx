@@ -464,8 +464,8 @@ function SamplingStage({ benchmark, mode, modeId, onModeChange, started, onRun, 
           ) : (
             <ActionMediaBox
               className="main-media"
-              label="Run sampler"
-              sublabel="Click this panel to play the selected sampling replay"
+              label="Refine and validate pose with sampler"
+              sublabel="Click this panel to run sampler"
               icon="▶"
               onClick={onRun}
             />
